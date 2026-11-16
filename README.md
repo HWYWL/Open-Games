@@ -2,12 +2,13 @@
 
 把开源网页游戏整理成飞牛 NAS 应用：应用中心装好后，桌面出现一个图标，点开是类 Steam 的游戏库面板，点任意游戏封面即在新标签页直接开玩。
 
-当前内置四款游戏（模型 / 纹理 / 音效均由代码程序化生成，无外部资源依赖）：
+当前内置五款游戏（模型 / 纹理 / 音效均由代码程序化生成，无外部资源依赖）：
 
 | 游戏 | 类型 | 说明 | 开源地址 |
 | --- | --- | --- | --- |
 | 🚲 鹈鹕骑自行车 | 海岸公路休闲骑行 | 布料物理围巾、昼夜循环、实时合成音乐，14 个成就 / 5 种镜头 | [riba2534/claude-opus-5-5-demo · pelican-bike](https://github.com/riba2534/claude-opus-5-5-demo/tree/main/pelican-bike) |
 | 🔫 穿越火线 · 运输船 | FPS 团队枪战 | 考据还原「运输船」地图，枪械弹道与后坐力、bots 对战、击杀播报 | [riba2534/claude-opus-5-5-demo · cf-transport-ship](https://github.com/riba2534/claude-opus-5-5-demo/tree/main/cf-transport-ship) |
+| 🎯 几猫 · 国产 3A 大作 | 单关 FPS | 雨夜集装箱港口，切断三个上行链路中继器，躲开无人机与机器狗，1.4 MB 单文件 | [realcodebear/saltline-fable-5.2](https://github.com/realcodebear/saltline-fable-5.2) |
 | 🏎️ QQ 飞车 | 竞速漂移 | 漂移集气、小喷 / 双喷 / 氮气、四张原创赛道、道具赛 | [riba2534/claude-opus-5-5-demo · qq-speed](https://github.com/riba2534/claude-opus-5-5-demo/tree/main/qq-speed) |
 | 👶 以撒的结合 · 地下室的束缚 | 肉鸽弹幕地牢 | 12 层随机地牢、13 个 Boss、11 种敌人、55 件可叠加道具，Canvas 全程序化绘图 | [liyupi/binding-of-isaac-webgame](https://github.com/liyupi/binding-of-isaac-webgame) |
 
@@ -41,6 +42,7 @@ Open-Games/
         └── games/
             ├── pelican-bike.html        # 单文件游戏
             ├── cf-transport-ship.html   # 单文件游戏
+            ├── saltline.html            # 单文件游戏（1.4 MB，含内联 three.js）
             ├── qq-speed.html            # 单文件游戏
             └── isaac/                   # 零构建的多文件游戏（index.html + css/ + js/）
 ```
@@ -83,6 +85,7 @@ tail -n 50 "$(ls -d /vol*/@appdata/Open-Games 2>/dev/null | head -1)/info.log"
 | 鹈鹕骑自行车 | [claude-opus-5-5-demo/pelican-bike](https://github.com/riba2534/claude-opus-5-5-demo/tree/main/pelican-bike) | `node build.mjs` 用 esbuild 打成一个 HTML |
 | 穿越火线 · 运输船 | [claude-opus-5-5-demo/cf-transport-ship](https://github.com/riba2534/claude-opus-5-5-demo/tree/main/cf-transport-ship) | 同上（JS + CSS 内联） |
 | QQ 飞车 | [claude-opus-5-5-demo/qq-speed](https://github.com/riba2534/claude-opus-5-5-demo/tree/main/qq-speed) | 同上 |
+| 几猫 · 国产 3A 大作 | [realcodebear/saltline-fable-5.2](https://github.com/realcodebear/saltline-fable-5.2) | 上游本身是单个 `index.html`，改名 `saltline.html` 后直接放入 |
 | 以撒的结合 · 地下室的束缚 | [liyupi/binding-of-isaac-webgame](https://github.com/liyupi/binding-of-isaac-webgame) | 零依赖零构建，原样拷贝 `index.html` + `css/` + `js/` |
 
 三款 Three.js 游戏（鹈鹕 / 运输船 / QQ 飞车）重新构建：
@@ -103,10 +106,17 @@ cd binding-of-isaac-webgame
 cp -r index.html css js <本仓库>/app/www/games/isaac/
 ```
 
+几猫 / Saltline 更新（上游只有一个 `index.html`）：
+
+```bash
+git clone https://github.com/realcodebear/saltline-fable-5.2
+cp saltline-fable-5.2/index.html <本仓库>/app/www/games/saltline.html
+```
+
 面板里的游戏清单、简介、键位表、开源地址都在 `app/www/index.html` 顶部的 `GAMES` 数组里，新增游戏只要把文件放进 `app/www/games/`，再补一条带 `href` 与 `repo` 的记录即可。
 
 ## 致谢与声明
 
-- 游戏源代码与美术分别来自 [claude-opus-5-5-demo](https://github.com/riba2534/claude-opus-5-5-demo) 与 [binding-of-isaac-webgame](https://github.com/liyupi/binding-of-isaac-webgame)，均为 MIT 许可；本仓库只做移植、封装与面板，封面横幅为展示用途的 AI 生成插图
-- 《穿越火线》《QQ 飞车》《以撒的结合》相关作品均为致敬性质的演示作品，与原厂 / 原作者无关
+- 游戏源代码与美术分别来自 [claude-opus-5-5-demo](https://github.com/riba2534/claude-opus-5-5-demo)、[binding-of-isaac-webgame](https://github.com/liyupi/binding-of-isaac-webgame) 与 [saltline-fable-5.2](https://github.com/realcodebear/saltline-fable-5.2)，均为 MIT 许可；本仓库只做移植、封装与面板，封面横幅为展示用途的 AI 生成插图
+- 《穿越火线》《QQ 飞车》《以撒的结合》相关作品均为致敬性质的演示作品，与原厂 / 原作者无关；Saltline 为原作者的独立作品，此处仅作本地托管
 - 本仓库代码以 MIT 许可证发布，见 [LICENSE](LICENSE)
