@@ -307,13 +307,18 @@
     right: 12px; bottom: 12px;
     width: 44px; height: 44px;
     display: grid; place-items: center;
+    padding: 0;
+    border: 0;
     border-radius: 50%;
     background: rgba(94, 200, 255, .95);
     box-shadow: 0 8px 24px rgba(0, 0, 0, .45);
+    cursor: pointer;
     opacity: 0;
     transform: translateY(8px) scale(.9);
-    transition: opacity .2s, transform .2s;
+    transition: opacity .2s, transform .2s, filter .2s;
   }
+  .play-float:hover { filter: brightness(1.1); }
+  .play-float:focus-visible { opacity: 1; transform: none; outline: 2px solid #fff; outline-offset: 2px; }
   .play-float svg { width: 16px; height: 16px; fill: #04121c; margin-left: 2px; }
   .card:hover .play-float, .card:focus-visible .play-float { opacity: 1; transform: translateY(0) scale(1); }
 
@@ -506,7 +511,7 @@
     <input id="q" type="search" placeholder="搜索游戏、类型…" autocomplete="off" />
   </label>
 
-  <span class="count" id="count">7 款游戏</span>
+  <span class="count" id="count">6 款游戏</span>
 </header>
 
 <main class="wrap">
@@ -537,6 +542,7 @@
   <footer>
     <span id="footLeft">运行于本机服务的飞牛 fnOS 游戏库 · 全部游戏离线可玩，无需外网</span>
     <span class="links">
+      <a href="https://github.com/HWYWL/Open-Games" target="_blank" rel="noopener noreferrer">开源地址</a>
       <a href="/healthz" target="_blank" rel="noopener">服务状态</a>
     </span>
   </footer>
@@ -584,8 +590,7 @@
       category: "休闲",
       short: "戴头盔墨镜、围红围巾的鹈鹕在海岸公路上骑车抓鱼，围巾是布料物理，昼夜从黄昏一路走到星空。",
       long: "一只鹈鹕沿着海岸公路骑行抓鱼。脖子上的红围巾是实时布料物理模拟，天色从黄昏渐变到星空月夜，海面有波浪与岸边碎浪。\n支持 14 个成就、5 种镜头（含电影运镜与鹈鹕视角），音效与音乐全部在浏览器内实时合成，节奏跟随踏频；触屏按钮与按帧率自适应画质。不操作时它会自动驾驶去追鱼。",
-      keys: [["W / S", "加速 / 减速"], ["A / D", "变道抓鱼"], ["空格", "跳跃"], ["T", "展翅抬前轮"], ["C", "切换镜头"], ["触屏", "自动显示虚拟按键"]],
-      featured: true
+      keys: [["W / S", "加速 / 减速"], ["A / D", "变道抓鱼"], ["空格", "跳跃"], ["T", "展翅抬前轮"], ["C", "切换镜头"], ["触屏", "自动显示虚拟按键"]]
     },
     {
       id: "cf-transport-ship",
@@ -605,13 +610,15 @@
       title: "QQ 飞车",
       en: "QQ Speed",
       cover: "assets/cover-qq.jpg",
+      hero: "assets/hero-qq.jpg",
       href: "games/qq-speed.html",
       repo: "https://github.com/riba2534/claude-opus-5-5-demo/tree/main/qq-speed",
       tags: ["竞速", "漂移", "道具赛"],
       category: "竞速",
       short: "还原飞车的键位与漂移手感：Shift 漂移集气、小喷双喷、Ctrl 氮气，内置四张原创赛道。",
       long: "完整还原 QQ 飞车的漂移玩法与键位：按住 Shift + 方向漂移集气，出弯回正瞬间点 ↑ 触发小喷，小喷叠氮气即成双喷，倒计时起步与跳台落地喷同样还原。\n内置四张赛道：十一城（城市夜景 11 处弯 + 发卡弯）、情迷爱琴海（爬坡连续弯）、法老金字塔（直道末端跳台）、雪地大冒险（8 字形立交），支持道具赛与多种视角。",
-      keys: [["↑ ↓ ← →", "加速 / 刹车 / 转向"], ["Shift + 方向", "漂移（按越久角度越大）"], ["↑ 或 W", "出弯回正瞬间小喷"], ["Ctrl / 空格", "氮气 / 道具"], ["Alt", "道具换位"], ["R", "复位"], ["C", "切换视角"], ["Esc", "暂停"]]
+      keys: [["↑ ↓ ← →", "加速 / 刹车 / 转向"], ["Shift + 方向", "漂移（按越久角度越大）"], ["↑ 或 W", "出弯回正瞬间小喷"], ["Ctrl / 空格", "氮气 / 道具"], ["Alt", "道具换位"], ["R", "复位"], ["C", "切换视角"], ["Esc", "暂停"]],
+      featured: true
     },
     {
       id: "isaac",
@@ -652,19 +659,7 @@
       long: "一个 HTML 文件写成的完整 FPS：3 分钟内清除 7 号区仓库里的 10 名敌人。四把武器（M4 卡宾枪 / KS-12 泵动 / P-9 手枪 / SR-7 长弓）各有独立开镜倍率与固定后坐力曲线，支持二段跳、攀越、下蹲与屏息稳枪。\n上游原本从 CDN 加载 three.js，这里已换成包内的本地文件、界面文案全部中文化，断网可玩。",
       keys: [["W A S D", "移动"], ["鼠标", "视角"], ["鼠标左键", "开火"], ["鼠标右键", "瞄准"], ["SHIFT", "冲刺 / 屏息"], ["空格", "跳跃 · 二段跳 · 攀越"], ["CTRL", "下蹲"], ["R", "换弹"], ["1–4 / 滚轮", "切换武器"], ["V", "射击模式"], ["ESC", "暂停"]]
     },
-    {
-      id: "fps-game",
-      title: "枪战 · 机甲战场",
-      en: "Mech Gunfight",
-      cover: "assets/cover-fps.jpg",
-      href: "games/fps-game/index.html",
-      repo: "https://github.com/StudiousXiaoYu/fps-game",
-      tags: ["FPS", "练枪", "React"],
-      category: "射击",
-      short: "React + Three.js 的第一人称练枪场：AK-47 带换弹与后坐力，打机器人目标得分。",
-      long: "React + Vite + Three.js 做的第一人称练枪场：AK-47 有换弹、后坐力与命中音效，场上刷机器人目标，打中即得分。\n上游带腾讯云开发的用户名登录与在线排行榜；这里是本地托管版本，昵称只存在本机浏览器，排行榜在无外网时不可用，练枪部分完全离线可玩。",
-      keys: [["W A S D", "移动"], ["鼠标", "视角（点击画面锁定指针）"], ["鼠标左键", "射击"], ["R", "换弹"], ["ESC", "释放鼠标"]]
-    }
+
   ];
 
   var RECENT_KEY = "og.recent.v1";
@@ -744,12 +739,12 @@
     gridEl.innerHTML = list.map(function (g) {
       var isRecent = !!recent[g.id];
       return (
-        '<article class="card" data-id="' + esc(g.id) + '" tabindex="0" role="button" aria-label="开始游戏：' + esc(g.title) + '">' +
+        '<article class="card" data-id="' + esc(g.id) + '" tabindex="0" role="button" aria-label="查看详情：' + esc(g.title) + '">' +
           '<div class="card-media">' +
             '<img src="' + esc(g.cover) + '" alt="' + esc(g.title) + ' 封面" loading="lazy" />' +
             '<div class="card-shade"></div>' +
             (isRecent ? '<span class="badge-recent">最近游玩</span>' : "") +
-            '<span class="play-float"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.1v13.8c0 .8.9 1.3 1.6.9l10.4-6.9c.6-.4.6-1.4 0-1.8L9.6 4.2C8.9 3.8 8 4.3 8 5.1Z"/></svg></span>' +
+            '<button class="play-float" type="button" data-play="1" aria-label="开始游戏：' + esc(g.title) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.1v13.8c0 .8.9 1.3 1.6.9l10.4-6.9c.6-.4.6-1.4 0-1.8L9.6 4.2C8.9 3.8 8 4.3 8 5.1Z"/></svg></button>' +
           '</div>' +
           '<div class="card-body">' +
             '<div class="card-title-row"><h3 class="card-title">' + esc(g.title) + '</h3><span class="card-en">' + esc(g.en) + '</span></div>' +
@@ -820,7 +815,10 @@
     var card = e.target.closest(".card");
     if (!card) return;
     var g = GAMES.filter(function (x) { return x.id === card.dataset.id; })[0];
-    if (g) play(g);
+    if (!g) return;
+    // 点封面上的播放按钮才直接开玩，其余区域点击打开详情
+    if (e.target.closest("[data-play]")) play(g);
+    else openSheet(g);
   });
 
   gridEl.addEventListener("keydown", function (e) {
@@ -829,7 +827,9 @@
     if (!card) return;
     e.preventDefault();
     var g = GAMES.filter(function (x) { return x.id === card.dataset.id; })[0];
-    if (g) play(g);
+    if (!g) return;
+    if (e.target.closest("[data-play]")) play(g);
+    else openSheet(g);
   });
 
   gridEl.addEventListener("contextmenu", function (e) {

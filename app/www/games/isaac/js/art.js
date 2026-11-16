@@ -18,7 +18,7 @@ const BLOOD_LT = '#d92c2c';
    Womb-family chapters (no tile grid, veins and membrane instead of stone). */
 const THEMES = {
   basement: {
-    name: 'THE BASEMENT',
+    name: '地下室',
     floorA: '#6e5c40', floorB: '#63523a', grout: '#4a3c28',
     wallFace: '#33281a', wallTop: '#4d3d26', wallDark: '#150e07',
     grime: 'rgba(24,15,7,0.58)', accent: '#94805a', fog: 'rgba(20,12,6,0.55)',

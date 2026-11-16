@@ -64,7 +64,7 @@ class Game {
     this.enterRoom(this.room, null);
     this.banner = {
       label: this.plan.chapter.label,
-      sub: `LEVEL ${level} / ${MAX_FLOOR}  ·  ${this.plan.rooms.length} ROOMS`,
+      sub: `第 ${level} 层 / 共 ${MAX_FLOOR} 层  ·  ${this.plan.rooms.length} 个房间`,
       t: 2.6,
     };
     this.bossDead = false;

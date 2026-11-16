@@ -19,18 +19,18 @@ const START_GX = 4, START_GY = 3;
    carries a boss pool rather than a single boss, so two runs down the same
    floor are not the same fight. */
 const CHAPTERS = [
-  { key: 'basement', theme: 'basement', label: 'BASEMENT', bosses: ['monstro', 'duke'] },
-  { key: 'cellar', theme: 'cellar', label: 'CELLAR', bosses: ['larry', 'monstro'] },
-  { key: 'caves', theme: 'caves', label: 'CAVES', bosses: ['chub', 'duke'] },
-  { key: 'catacombs', theme: 'catacombs', label: 'CATACOMBS', bosses: ['gurdy', 'larry'] },
-  { key: 'depths', theme: 'depths', label: 'DEPTHS', bosses: ['monstroII', 'chub'] },
-  { key: 'necropolis', theme: 'necropolis', label: 'NECROPOLIS', bosses: ['mom', 'gurdy'] },
-  { key: 'womb', theme: 'womb', label: 'WOMB', bosses: ['scolex', 'monstroII'] },
-  { key: 'utero', theme: 'utero', label: 'UTERO', bosses: ['momsHeart', 'scolex'] },
+  { key: 'basement', theme: 'basement', label: '地下室', bosses: ['monstro', 'duke'] },
+  { key: 'cellar', theme: 'cellar', label: '地窖', bosses: ['larry', 'monstro'] },
+  { key: 'caves', theme: 'caves', label: '洞穴', bosses: ['chub', 'duke'] },
+  { key: 'catacombs', theme: 'catacombs', label: '地下墓穴', bosses: ['gurdy', 'larry'] },
+  { key: 'depths', theme: 'depths', label: '深处', bosses: ['monstroII', 'chub'] },
+  { key: 'necropolis', theme: 'necropolis', label: '死灵之城', bosses: ['mom', 'gurdy'] },
+  { key: 'womb', theme: 'womb', label: '子宫', bosses: ['scolex', 'monstroII'] },
+  { key: 'utero', theme: 'utero', label: '子宫内部', bosses: ['momsHeart', 'scolex'] },
   { key: 'bluewomb', theme: 'bluewomb', label: '? ? ?', bosses: ['hush'] },
   { key: 'sheol', theme: 'sheol', label: 'SHEOL', bosses: ['satan'] },
   { key: 'cathedral', theme: 'cathedral', label: 'CATHEDRAL', bosses: ['isaacBoss'] },
-  { key: 'chest', theme: 'chest', label: 'THE CHEST', bosses: ['blueBaby'] },
+  { key: 'chest', theme: 'chest', label: '宝箱', bosses: ['blueBaby'] },
 ];
 
 /* ---------------------------------------------------------------- floorplan */

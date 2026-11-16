@@ -1,11 +1,13 @@
 appname               = Open-Games
-version               = 1.0.0
+version               = 1.1.0
 display_name          = 游戏合集
-desc                  = 打开即玩的 3D 网页游戏库：鹈鹕骑自行车、穿越火线·运输船、QQ 飞车。点击游戏封面在新标签页直接开玩，全部资源内置，无需外网。
+desc                  = <p>一个装好就能玩的 3D 网页游戏库，现在有 6 款开源游戏：鹈鹕骑自行车、穿越火线·运输船、QQ 飞车、几猫 3A 大作、铁幕行动·仓库区、以撒的结合。点封面进详情，点播放键在新标签页直接开玩；全部资源随包内置，断网也能玩。</p><p><img src='https://raw.githubusercontent.com/HWYWL/Open-Games/main/docs/screenshots/panel.jpg' width='640' /></p><p><b>QQ 飞车</b>：Shift 漂移集气、小喷双喷、Ctrl 氮气，四张原创赛道。</p><p><img src='https://raw.githubusercontent.com/HWYWL/Open-Games/main/docs/screenshots/qq-speed.jpg' width='640' /></p><p><b>以撒的结合</b>：12 层随机地牢、13 个 Boss、55 件道具，界面已中文化。</p><p><img src='https://raw.githubusercontent.com/HWYWL/Open-Games/main/docs/screenshots/isaac.jpg' width='640' /></p><p>服务默认端口 8468，支持手机浏览器；游戏与面板均无需外网。</p>
 platform              = all
 source                = thirdparty
-maintainer            = Open-Games
-distributor           = Open-Games
+maintainer            = HWYWL
+maintainer_url        = https://github.com/HWYWL/Open-Games
+distributor           = HWYWL
+distributor_url       = https://github.com/HWYWL/Open-Games
 service_port          = 8468
 checkport             = true
 ctl_stop              = true
