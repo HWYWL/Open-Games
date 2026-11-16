@@ -22,6 +22,13 @@
 - 分类筛选、搜索框（`/` 聚焦）、最近游玩标记（浏览器本地存储）
 - 移动端自动切换为单列布局，游戏本身也支持触屏
 
+## 界面截图
+
+<img src="docs/screenshots/panel.jpg" width="720" alt="游戏库面板" />
+
+<img src="docs/screenshots/qq-speed.jpg" width="480" alt="QQ 飞车" /> <img src="docs/screenshots/isaac.jpg" width="480" alt="以撒的结合" />
+
+> 应用中心「应用介绍」只放一张 300 宽的横幅图（`docs/screenshots/intro-strip.jpg`）：fnpack 对 `desc` 有约 412 字上限，应用中心还会对介绍里的图片做裁切，多张大图会被截断。
 ## 目录结构
 
 ```
