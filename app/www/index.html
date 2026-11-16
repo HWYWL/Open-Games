@@ -506,7 +506,7 @@
     <input id="q" type="search" placeholder="搜索游戏、类型…" autocomplete="off" />
   </label>
 
-  <span class="count" id="count">5 款游戏</span>
+  <span class="count" id="count">7 款游戏</span>
 </header>
 
 <main class="wrap">
@@ -628,7 +628,7 @@
     },
     {
       id: "saltline",
-      title: "几猫 · 国产 3A 大作",
+      title: "几猫 · 源于Saltline汉化 3A 大作",
       en: "Saltline FPS",
       cover: "assets/cover-saltline.jpg",
       href: "games/saltline.html",
@@ -638,6 +638,32 @@
       short: "雨夜集装箱港口的第一人称射击：切断三个上行链路中继器，同时躲开无人机「海鸥」与机器狗「猎犬」。",
       long: "雨夜港口的一关式第一人称射击：目标是切断 3 个上行链路中继器，同时被无人机与机器狗追杀。\n模型、贴图、音效全部由代码实时生成，整个游戏就是一个 1.4 MB 的单文件 HTML，断网可玩。进入游戏后先点一下画面捕获鼠标（浏览器不允许捕获时，按住鼠标左键拖动也能转视角）。",
       keys: [["W A S D", "移动"], ["鼠标", "视角（先点击画面捕获）"], ["鼠标左键", "开火"], ["鼠标右键", "瞄准"], ["Shift", "冲刺"], ["空格", "跳跃"], ["C", "蹲伏"], ["R", "换弹"], ["E", "切断中继"], ["F / V", "近战"], ["Esc", "暂停"]]
+    },
+    {
+      id: "ironhold",
+      title: "铁幕行动 · 仓库区",
+      en: "Operation Ironhold",
+      cover: "assets/cover-ironhold.jpg",
+      href: "games/ironhold/index.html",
+      repo: "https://github.com/StarKnightt/operation-ironhold",
+      tags: ["FPS", "单关战役", "3D"],
+      category: "射击",
+      short: "3 分钟内清空集装箱仓库区的 10 名敌人：四把枪、机瞄、二段跳与攀越，界面已中文化。",
+      long: "一个 HTML 文件写成的完整 FPS：3 分钟内清除 7 号区仓库里的 10 名敌人。四把武器（M4 卡宾枪 / KS-12 泵动 / P-9 手枪 / SR-7 长弓）各有独立开镜倍率与固定后坐力曲线，支持二段跳、攀越、下蹲与屏息稳枪。\n上游原本从 CDN 加载 three.js，这里已换成包内的本地文件、界面文案全部中文化，断网可玩。",
+      keys: [["W A S D", "移动"], ["鼠标", "视角"], ["鼠标左键", "开火"], ["鼠标右键", "瞄准"], ["SHIFT", "冲刺 / 屏息"], ["空格", "跳跃 · 二段跳 · 攀越"], ["CTRL", "下蹲"], ["R", "换弹"], ["1–4 / 滚轮", "切换武器"], ["V", "射击模式"], ["ESC", "暂停"]]
+    },
+    {
+      id: "fps-game",
+      title: "枪战 · 机甲战场",
+      en: "Mech Gunfight",
+      cover: "assets/cover-fps.jpg",
+      href: "games/fps-game/index.html",
+      repo: "https://github.com/StudiousXiaoYu/fps-game",
+      tags: ["FPS", "练枪", "React"],
+      category: "射击",
+      short: "React + Three.js 的第一人称练枪场：AK-47 带换弹与后坐力，打机器人目标得分。",
+      long: "React + Vite + Three.js 做的第一人称练枪场：AK-47 有换弹、后坐力与命中音效，场上刷机器人目标，打中即得分。\n上游带腾讯云开发的用户名登录与在线排行榜；这里是本地托管版本，昵称只存在本机浏览器，排行榜在无外网时不可用，练枪部分完全离线可玩。",
+      keys: [["W A S D", "移动"], ["鼠标", "视角（点击画面锁定指针）"], ["鼠标左键", "射击"], ["R", "换弹"], ["ESC", "释放鼠标"]]
     }
   ];
 
