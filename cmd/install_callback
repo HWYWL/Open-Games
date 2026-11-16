@@ -1,0 +1,20 @@
+#!/bin/bash
+
+### 安装完成后：准备运行目录并记录版本
+
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:${PATH}"
+
+PKG_VAR="${TRIM_PKGVAR:-/tmp/Open-Games}"
+APP_DEST="${TRIM_APPDEST:-$(cd "$(dirname "$0")/.." && pwd)}"
+
+mkdir -p "${PKG_VAR}" 2>/dev/null
+
+{
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - installed Open-Games, dest=${APP_DEST}"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - web root: ${APP_DEST}/www"
+    if [ -d "${APP_DEST}/www/games" ]; then
+        echo "$(date '+%Y-%m-%d %H:%M:%S') - games: $(ls -1 "${APP_DEST}/www/games" | tr '\n' ' ')"
+    fi
+} >> "${PKG_VAR}/info.log" 2>/dev/null
+
+exit 0

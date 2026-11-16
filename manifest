@@ -1,0 +1,14 @@
+appname               = Open-Games
+version               = 1.0.0
+display_name          = 游戏合集
+desc                  = 打开即玩的 3D 网页游戏库：鹈鹕骑自行车、穿越火线·运输船、QQ 飞车。点击游戏封面在新标签页直接开玩，全部资源内置，无需外网。
+platform              = all
+source                = thirdparty
+maintainer            = Open-Games
+distributor           = Open-Games
+service_port          = 8468
+checkport             = true
+ctl_stop              = true
+os_min_version        = 1.0.0
+desktop_uidir         = ui
+desktop_applaunchname = Open-Games.Application

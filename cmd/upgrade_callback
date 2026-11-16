@@ -1,0 +1,13 @@
+#!/bin/bash
+
+### 升级完成后：沿用安装后的目录初始化逻辑
+
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:${PATH}"
+
+CMD_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+if [ -x "${CMD_DIR}/install_callback" ]; then
+    "${CMD_DIR}/install_callback"
+fi
+
+exit 0
