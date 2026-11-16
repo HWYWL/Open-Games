@@ -417,6 +417,8 @@
   .sheet-body .long p { margin: 0 0 9px; }
   .sheet-body .long p:last-child { margin-bottom: 0; }
 
+  .sheet-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
   .keys { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; margin-bottom: 20px; }
   .key-item {
     display: flex; align-items: center; gap: 9px;
@@ -504,7 +506,7 @@
     <input id="q" type="search" placeholder="搜索游戏、类型…" autocomplete="off" />
   </label>
 
-  <span class="count" id="count">3 款游戏</span>
+  <span class="count" id="count">4 款游戏</span>
 </header>
 
 <main class="wrap">
@@ -551,10 +553,16 @@
       <div class="pills" id="sheetPills"></div>
       <div class="long" id="sheetDesc"></div>
       <div class="keys" id="sheetKeys"></div>
-      <button class="btn btn-primary" id="sheetPlay">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.1v13.8c0 .8.9 1.3 1.6.9l10.4-6.9c.6-.4.6-1.4 0-1.8L9.6 4.2C8.9 3.8 8 4.3 8 5.1Z"/></svg>
-        开始游戏
-      </button>
+      <div class="sheet-actions">
+        <button class="btn btn-primary" id="sheetPlay">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.1v13.8c0 .8.9 1.3 1.6.9l10.4-6.9c.6-.4.6-1.4 0-1.8L9.6 4.2C8.9 3.8 8 4.3 8 5.1Z"/></svg>
+          开始游戏
+        </button>
+        <a class="btn btn-ghost" id="sheetRepo" href="#" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.36 1.09 2.94.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.85-2.34 4.7-4.57 4.95.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg>
+          开源项目
+        </a>
+      </div>
     </div>
   </div>
 </div>
@@ -571,6 +579,7 @@
       cover: "assets/cover-pelican.jpg",
       hero: "assets/hero-pelican.jpg",
       href: "games/pelican-bike.html",
+      repo: "https://github.com/riba2534/claude-opus-5-5-demo/tree/main/pelican-bike",
       tags: ["休闲", "骑行", "3D"],
       category: "休闲",
       short: "戴头盔墨镜、围红围巾的鹈鹕在海岸公路上骑车抓鱼，围巾是布料物理，昼夜从黄昏一路走到星空。",
@@ -584,6 +593,7 @@
       en: "Cross Fire · Transport Ship",
       cover: "assets/cover-cf.jpg",
       href: "games/cf-transport-ship.html",
+      repo: "https://github.com/riba2534/claude-opus-5-5-demo/tree/main/cf-transport-ship",
       tags: ["FPS", "射击", "对战"],
       category: "射击",
       short: "还原经典地图「运输船」：长条甲板、两端船舱出生点、中部 V 形集装箱，完整 FPS 对战玩法。",
@@ -596,11 +606,25 @@
       en: "QQ Speed",
       cover: "assets/cover-qq.jpg",
       href: "games/qq-speed.html",
+      repo: "https://github.com/riba2534/claude-opus-5-5-demo/tree/main/qq-speed",
       tags: ["竞速", "漂移", "道具赛"],
       category: "竞速",
       short: "还原飞车的键位与漂移手感：Shift 漂移集气、小喷双喷、Ctrl 氮气，内置四张原创赛道。",
       long: "完整还原 QQ 飞车的漂移玩法与键位：按住 Shift + 方向漂移集气，出弯回正瞬间点 ↑ 触发小喷，小喷叠氮气即成双喷，倒计时起步与跳台落地喷同样还原。\n内置四张赛道：十一城（城市夜景 11 处弯 + 发卡弯）、情迷爱琴海（爬坡连续弯）、法老金字塔（直道末端跳台）、雪地大冒险（8 字形立交），支持道具赛与多种视角。",
       keys: [["↑ ↓ ← →", "加速 / 刹车 / 转向"], ["Shift + 方向", "漂移（按越久角度越大）"], ["↑ 或 W", "出弯回正瞬间小喷"], ["Ctrl / 空格", "氮气 / 道具"], ["Alt", "道具换位"], ["R", "复位"], ["C", "切换视角"], ["Esc", "暂停"]]
+    },
+    {
+      id: "isaac",
+      title: "以撒的结合 · 地下室的束缚",
+      en: "The Binding",
+      cover: "assets/cover-isaac.jpg",
+      href: "games/isaac/index.html",
+      repo: "https://github.com/liyupi/binding-of-isaac-webgame",
+      tags: ["肉鸽", "弹幕射击", "地牢"],
+      category: "肉鸽",
+      short: "12 层随机地牢、13 个 Boss、55 件可叠加道具，全部图形由 Canvas 代码绘制，零依赖零构建。",
+      long: "复刻《以撒的结合》核心玩法的俯视角肉鸽：12 层地牢、13 个 Boss、11 种敌人、55 件可叠加道具。随机地牢生成照着原作算法的逆向资料实现，图形与音效全部由代码现场绘制 / 合成，不含任何外部素材。\nWASD 移动、方向键朝四向射眼泪，清房拿道具滚雪球，一路打到第 12 层。手机端会自动出现虚拟摇杆与射击按钮。",
+      keys: [["W A S D", "移动"], ["↑ ↓ ← →", "朝对应方向发射眼泪"], ["Enter / 空格", "开始 / 重新开始"], ["P", "暂停"], ["M", "开关音效"], ["移动端", "虚拟摇杆 + 四向射击键"]]
     }
   ];
 
@@ -729,6 +753,13 @@
       closeSheet();
       play(g);
     };
+    var repoEl = document.getElementById("sheetRepo");
+    if (g.repo) {
+      repoEl.href = g.repo;
+      repoEl.style.display = "";
+    } else {
+      repoEl.style.display = "none";
+    }
     modal.classList.add("open");
   }
 
