@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>准备资源 · Open Games</title>
+<style>
+  :root {
+    --bg: #080b10;
+    --line: #1e2634;
+    --ink: #e8eef6;
+    --soft: #8d9bae;
+    --accent: #5ec8ff;
+    --warm: #ff8a5c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; background:
+      radial-gradient(900px 520px at 18% -10%, #16202e 0%, transparent 70%),
+      radial-gradient(760px 460px at 100% 0%, #1b1414 0%, transparent 65%),
+      var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans SC", sans-serif;
+    display: grid; place-items: center; padding: 24px;
+  }
+  .card {
+    width: min(580px, 100%);
+    background: linear-gradient(180deg, rgba(22,28,38,.96), rgba(14,19,26,.98));
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 26px 26px 22px;
+    box-shadow: 0 24px 70px rgba(0,0,0,.55);
+  }
+  .tag {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 12px; letter-spacing: .12em; color: var(--warm);
+    text-transform: uppercase; font-weight: 700;
+  }
+  .tag i { width: 7px; height: 7px; border-radius: 50%; background: var(--warm); box-shadow: 0 0 10px var(--warm); }
+  h1 { font-size: 22px; margin: 12px 0 6px; letter-spacing: .01em; }
+  p.lead { margin: 0 0 18px; color: var(--soft); font-size: 13px; line-height: 1.65; }
+  .bar { height: 10px; border-radius: 99px; background: #1b2431; overflow: hidden; border: 1px solid #233044; }
+  .bar > i { display: block; height: 100%; width: 0%; border-radius: 99px;
+    background: linear-gradient(90deg, var(--accent), #79ffd3); transition: width .3s ease; }
+  .meta { display: flex; justify-content: space-between; gap: 12px; margin-top: 9px; font-size: 12px; color: var(--soft); font-variant-numeric: tabular-nums; }
+  .actions { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  .btn {
+    appearance: none; border: 1px solid transparent; border-radius: 11px;
+    padding: 12px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+    font-family: inherit; transition: transform .12s, filter .12s; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn.primary { background: linear-gradient(180deg, #ff9d6e, var(--warm)); color: #26150c; }
+  .btn.primary:hover { filter: brightness(1.06); }
+  .btn.ghost { background: #161d28; color: var(--ink); border-color: var(--line); }
+  .btn[disabled] { opacity: .55; cursor: default; }
+  .hint { margin-top: 14px; font-size: 12px; color: #7b8a9d; line-height: 1.6; }
+  .err { margin-top: 14px; font-size: 12.5px; color: #ffb3b3; background: rgba(255,80,80,.08);
+    border: 1px solid rgba(255,80,80,.25); border-radius: 10px; padding: 10px 12px; line-height: 1.7; }
+  .err code { color: #ffd7c9; word-break: break-all; }
+  details { margin-top: 10px; font-size: 12px; color: #7b8a9d; }
+  details summary { cursor: pointer; }
+  details code { display: block; margin-top: 6px; color: #9fb0c4; word-break: break-all; line-height: 1.6; }
+  a { color: var(--accent); }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="card">
+  <span class="tag"><i></i><span id="tag">首次运行准备</span></span>
+  <h1 id="title">正在准备游戏资源</h1>
+  <p class="lead" id="lead">这个游戏体积较大，没有放进安装包，第一次打开时需要下载一次。下载完成后自动解压，以后完全离线运行。</p>
+
+  <div class="bar"><i id="fill"></i></div>
+  <div class="meta"><span id="state">检查中…</span><span id="size"></span></div>
+
+  <div class="actions">
+    <button class="btn primary" id="go" type="button" disabled>下载并开始</button>
+    <a class="btn ghost" id="enter" href="#">先进入游戏</a>
+    <a class="btn ghost" href="./">返回游戏库</a>
+  </div>
+
+  <div class="hint" id="hint">
+    下载由本机服务端完成，关掉这个页面不会中断；失败可以点按钮重试。
+  </div>
+
+  <div class="err hidden" id="err"></div>
+  <details id="detail" class="hidden">
+    <summary>技术细节（排查用）</summary>
+    <code id="detailText"></code>
+  </details>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var key = new URLSearchParams(location.search).get("g") || "";
+  var $ = function (id) { return document.getElementById(id); };
+  var entry = null;
+  var timer = 0;
+  var starting = false;
+
+  function mb(bytes) { return (bytes / 1048576).toFixed(1) + " MB"; }
+  function targetUrl() { return entry.target.replace(/\/+$/, "") + "/index.html"; }
+
+  function showError(text, raw) {
+    $("err").innerHTML = text;
+    $("err").classList.remove("hidden");
+    if (raw) {
+      $("detail").classList.remove("hidden");
+      $("detailText").textContent = raw;
+    }
+  }
+
+  function clearError() {
+    $("err").classList.add("hidden");
+    $("detail").classList.add("hidden");
+  }
+
+  /* 把服务端抛回来的英文异常翻成能照着做的中文 */
+  function humanError(text) {
+    var t = String(text || "");
+    if (/HTTP 404/.test(t))
+      return "资源包还没发布：下载地址返回 404（Release 里没有这个文件，或 tag / 文件名对不上）。" +
+        "把 <code>great-powers-rts.zip</code> 传到 GitHub Release，或者改 <code>app/www/extras.json</code> 里的 <code>url</code>。";
+    if (/HTTP 403|HTTP 429/.test(t))
+      return "下载源拒绝了请求（403 / 429，可能是频率限制或需要登录），过一会儿再试，或换镜像地址。";
+    if (/timed out|timeout|getaddrinfo|Name or service|SSL|Connection|reset/i.test(t))
+      return "这台 NAS 连不上下载地址（超时或被墙）。可以在 <code>extras.json</code> 的 <code>mirrors</code> 里加一个能访问的地址，或者手动下载解压。";
+    if (/sha256|大小不符/.test(t))
+      return "下载到的文件和清单里的校验值不一致：远端那版包换过了，需要同步更新 <code>extras.json</code> 的 <code>bytes</code> / <code>sha256</code>。";
+    return "下载失败：" + "<code>" + t.replace(/[<>&]/g, "") + "</code>";
+  }
+
+  function setProgress(pct, label, sizeText) {
+    $("fill").style.width = Math.max(0, Math.min(100, pct)) + "%";
+    if (label) $("state").textContent = label;
+    if (sizeText !== undefined) $("size").textContent = sizeText;
+  }
+
+  function render(status) {
+    $("enter").href = targetUrl();
+
+    if (status.error) {
+      var pctErr = status.total ? (status.received / status.total) * 100 : 0;
+      setProgress(pctErr, "下载失败", status.total ? mb(status.received) + " / " + mb(status.total) : "");
+      showError(humanError(status.error), status.error);
+      $("go").disabled = false;
+      $("go").textContent = "重试下载";
+      $("tag").textContent = "下载失败";
+      return;
+    }
+
+    clearError();
+
+    if (status.downloading) {
+      var pct = status.total ? (status.received / status.total) * 100 : 0;
+      setProgress(pct, "正在下载…", status.total
+        ? mb(status.received) + " / " + mb(status.total)
+        : mb(status.received));
+      $("go").disabled = true;
+      $("go").textContent = "下载中…";
+      $("enter").classList.add("hidden");
+      return;
+    }
+
+    if (status.installed && !status.stale) {
+      setProgress(100, "已就绪，正在进入…", "");
+      $("go").disabled = true;
+      $("go").classList.add("hidden");
+      $("enter").classList.add("hidden");
+      setTimeout(function () { location.replace(targetUrl()); }, 260);
+      return;
+    }
+
+    if (status.installed && status.stale) {
+      setProgress(100, "已安装，有新版本资源", "");
+      $("tag").textContent = "资源有更新";
+      $("lead").textContent = "本地已经装过一份，但资源包更新了（" +
+        (status.total ? mb(status.total) : "新版本") + "）。可以直接先玩旧版本，也可以下载新资源。";
+      $("go").disabled = false;
+      $("go").textContent = "下载更新";
+      $("go").classList.remove("hidden");
+      $("enter").classList.remove("hidden");
+      return;
+    }
+
+    var total = status.total || (entry.bytes || 0);
+    setProgress(0, "等待开始", total ? "0 / " + mb(total) : "");
+    $("go").disabled = false;
+    $("go").classList.remove("hidden");
+    $("go").textContent = starting ? "正在启动…" : "下载并开始";
+    $("enter").classList.add("hidden");
+  }
+
+  function poll() {
+    fetch("api/extras/" + encodeURIComponent(key) + "/status", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status)); })
+      .then(function (status) {
+        render(status);
+        var finished = status.installed && !status.stale;
+        if (finished || (status.error && !status.downloading)) {
+          clearInterval(timer); timer = 0;
+        }
+      })
+      .catch(function () {
+        clearInterval(timer); timer = 0;
+        $("tag").textContent = "无法自动下载";
+        $("lead").textContent = "没有连上本机服务，或这个页面不是由 Open-Games 服务端提供的，自动下载不可用。";
+        $("state").textContent = "请手动准备资源";
+        $("size").textContent = "";
+        $("go").disabled = true;
+        $("go").classList.add("hidden");
+        showError("自动下载需要 Open-Games 自带的 Python 服务端（默认端口 8468，接口 <code>/api/extras</code>）。",
+          "静态托管时请手动下载并解压到 app/www/games/great-powers-rts/");
+      });
+  }
+
+  function begin() {
+    if (starting) return;
+    starting = true;
+    $("go").disabled = true;
+    $("go").textContent = "正在启动…";
+    fetch("api/extras/" + encodeURIComponent(key) + "/install", { method: "POST" })
+      .then(function (r) { return r.json(); })
+      .then(function (status) {
+        starting = false;
+        render(status);
+        if (!timer) timer = setInterval(poll, 900);
+      })
+      .catch(function () {
+        starting = false;
+        showError("启动下载失败，请确认服务端版本支持 <code>/api/extras</code>。");
+        $("go").disabled = false;
+        $("go").textContent = "重试下载";
+      });
+  }
+
+  if (!key) {
+    $("title").textContent = "缺少游戏参数";
+    $("lead").textContent = "这个页面用法：play.html?g=<游戏 id>，请从游戏库进入。";
+    $("state").textContent = "";
+    $("go").remove();
+    $("enter").remove();
+    return;
+  }
+
+  fetch("extras.json", { cache: "no-store" })
+    .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error("no extras")); })
+    .then(function (data) {
+      entry = data && data[key];
+      if (!entry) throw new Error("unknown game");
+      $("title").textContent = entry.title || key;
+      $("lead").textContent = "这个游戏体积较大（" +
+        (entry.bytes ? mb(entry.bytes) : "约 110 MB") +
+        "），没有放进安装包，第一次打开时下载一次。下载完成后自动解压，之后完全离线运行。";
+      $("hint").innerHTML = "下载由本机服务端完成，关掉这个页面不会中断；失败可以点按钮重试。" +
+        '手动安装：把 zip 解压到 <code>app/www/games/great-powers-rts/</code>，' +
+        '<a id="srcLink" href="' + entry.url + '" target="_blank" rel="noopener noreferrer">下载地址</a>。';
+      $("go").addEventListener("click", begin);
+      poll();
+      timer = setInterval(poll, 900);
+    })
+    .catch(function () {
+      $("title").textContent = "没找到这个游戏的资源记录";
+      $("lead").textContent = "extras.json 里没有对应条目，或者游戏本身就是静态托管，不需要额外下载。";
+      $("state").textContent = "";
+      $("go").remove();
+      $("enter").remove();
+    });
+})();
+</script>
+</body>
+</html>

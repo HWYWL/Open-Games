@@ -1,0 +1,9 @@
+{
+  "name": "nuketown-relay",
+  "version": "1.0.0",
+  "private": true,
+  "description": "pastel-nuketown 联机中继（原样取自上游 server）",
+  "main": "server.mjs",
+  "engines": { "node": ">=22.5" },
+  "dependencies": { "ws": "^8.21.1" }
+}

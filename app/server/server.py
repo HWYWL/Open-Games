@@ -8,11 +8,18 @@
 
 import argparse
 import gzip
+import hashlib
 import json
 import os
 import posixpath
+import shutil
 import sys
+import threading
+import time
+import urllib.error
 import urllib.parse
+import urllib.request
+import zipfile
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -41,6 +48,265 @@ COMPRESSIBLE = {".html", ".htm", ".css", ".js", ".mjs", ".json", ".svg", ".txt",
 GZIP_MIN_SIZE = 1024
 GZIP_CACHE = {}
 
+# ---------- 大游戏资源包（放不进安装包的那些） ----------
+# 清单在 www/extras.json；下载地址指向 GitHub Release 的资源包。
+EXTRAS_FILE = "extras.json"
+EXTRAS_TARGET_PREFIX = "games/"
+EXTRAS_STATE = {}
+EXTRAS_LOCK = threading.Lock()
+EXTRAS_CHUNK = 1 << 20
+
+
+def _extras_manifest(root):
+    path = os.path.join(root, EXTRAS_FILE)
+    try:
+        with open(path, "r", encoding="utf-8") as fh:
+            data = json.load(fh)
+    except (OSError, ValueError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _extras_entry(root, key):
+    """把清单里的一条记录校验成可以放心下载解压的形状。"""
+    if not key or "/" in key or "\\" in key or key.startswith("."):
+        return None
+    raw = _extras_manifest(root).get(key)
+    if not isinstance(raw, dict):
+        return None
+    url = raw.get("url")
+    target = raw.get("target")
+    if not isinstance(url, str) or not url.startswith(("http://", "https://")):
+        return None
+    if not isinstance(target, str) or not target.replace("\\", "/").startswith(EXTRAS_TARGET_PREFIX):
+        return None
+    parts = target.replace("\\", "/").split("/")
+    if ".." in parts or ".installed.json" in parts:
+        return None
+    try:
+        size = int(raw.get("bytes") or 0)
+    except (TypeError, ValueError):
+        size = 0
+    digest = raw.get("sha256")
+    rev = raw.get("rev")
+    mirrors = raw.get("mirrors")
+    if not isinstance(mirrors, list):
+        mirrors = []
+    return {
+        "key": key,
+        "title": raw.get("title") or key,
+        "url": url,
+        "mirrors": [m for m in mirrors if isinstance(m, str) and m.startswith(("http://", "https://"))],
+        "target": os.path.join(*parts),
+        "bytes": max(0, size),
+        "sha256": digest.strip().lower() if isinstance(digest, str) else "",
+        "rev": rev.strip() if isinstance(rev, str) else "",
+    }
+
+
+def _extras_marker(root, entry):
+    """上次安装时写下的标记：用来判断装的是不是当前这一版资源包。"""
+    path = os.path.join(root, entry["target"], ".installed.json")
+    try:
+        with open(path, "r", encoding="utf-8") as fh:
+            data = json.load(fh)
+    except (OSError, ValueError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _extras_installed(root, entry):
+    return os.path.isfile(os.path.join(root, entry["target"], "index.html"))
+
+
+def _extras_stale(root, entry):
+    """已安装、但装的是旧资源包 —— 通常是远端换了包并改了 rev。"""
+    if not _extras_installed(root, entry) or not entry["rev"]:
+        return False
+    return str(_extras_marker(root, entry).get("rev") or "") != entry["rev"]
+
+
+def _extras_state(key):
+    with EXTRAS_LOCK:
+        return dict(EXTRAS_STATE.get(key) or {})
+
+
+def _extras_patch(key, **fields):
+    with EXTRAS_LOCK:
+        state = EXTRAS_STATE.setdefault(key, {})
+        state.update(fields)
+        state["updatedAt"] = int(time.time())
+
+
+def _extras_status(root, entry):
+    state = _extras_state(entry["key"])
+    total = entry["bytes"] or int(state.get("total") or 0)
+    downloading = bool(state.get("downloading"))
+    error = state.get("error") or ""
+    received = int(state.get("received") or 0)
+    installed = _extras_installed(root, entry)
+    stale = _extras_stale(root, entry)
+    # 空闲且未安装时不要把上一轮的进度当成当前进度显示
+    if not downloading and not error and not installed:
+        received = 0
+    return {
+        "key": entry["key"],
+        "title": entry["title"],
+        "installed": installed,
+        "stale": stale,
+        "rev": entry["rev"],
+        "downloading": downloading,
+        "received": received,
+        "total": total,
+        "error": error,
+        "url": entry["url"],
+        "updatedAt": int(state.get("updatedAt") or 0),
+    }
+
+
+def _extras_cache_dir(root):
+    # 解压与下载的中间文件放在 www 之外，避免被当成静态资源访问
+    pkgvar = os.environ.get("TRIM_PKGVAR")
+    base = pkgvar if pkgvar and os.path.isdir(pkgvar) else os.path.join(root, os.pardir, ".extras-cache")
+    return os.path.abspath(base)
+
+
+def _safe_extract(zip_path, dest):
+    dest_abs = os.path.abspath(dest)
+    with zipfile.ZipFile(zip_path) as zf:
+        for info in zf.infolist():
+            name = info.filename
+            if not name or name.endswith("/"):
+                continue
+            target = os.path.abspath(os.path.join(dest_abs, name))
+            if target != dest_abs and not target.startswith(dest_abs + os.sep):
+                raise ValueError("压缩包条目越界：%s" % name)
+        zf.extractall(dest_abs)
+    # 若压缩包套了一层同名目录，取那一层，避免变成 games/x/x/index.html
+    items = [i for i in os.listdir(dest_abs) if not i.startswith(".")]
+    if len(items) == 1:
+        single = os.path.join(dest_abs, items[0])
+        if os.path.isdir(single) and os.path.isfile(os.path.join(single, "index.html")):
+            return single
+    return dest_abs
+
+
+def _extras_download(key, entry, part):
+    """按 url + mirrors 的顺序下载，任何一个成功就返回字节数；
+    全失败时把每次尝试的错误拼起来，前端据此给出可操作的提示。"""
+    urls = [entry["url"]] + [m for m in entry["mirrors"] if m != entry["url"]]
+    failures = []
+    for url in urls:
+        received = 0
+        try:
+            request = urllib.request.Request(url, headers={
+                "User-Agent": "Open-Games/" + VERSION,
+                "Accept": "application/zip,application/octet-stream,*/*",
+            })
+            with urllib.request.urlopen(request, timeout=45) as response, open(part, "wb") as fh:
+                header_total = int(response.headers.get("Content-Length") or 0)
+                _extras_patch(key, total=entry["bytes"] or header_total, source=url)
+                while True:
+                    chunk = response.read(EXTRAS_CHUNK)
+                    if not chunk:
+                        break
+                    fh.write(chunk)
+                    received += len(chunk)
+                    _extras_patch(key, received=received)
+            if entry["bytes"] and received != entry["bytes"]:
+                raise ValueError("大小不符（%d / %d 字节）" % (received, entry["bytes"]))
+            if entry["sha256"]:
+                digest = hashlib.sha256()
+                with open(part, "rb") as fh:
+                    for chunk in iter(lambda: fh.read(EXTRAS_CHUNK), b""):
+                        digest.update(chunk)
+                if digest.hexdigest() != entry["sha256"]:
+                    raise ValueError("sha256 校验不通过（远端文件不是这一版）")
+            return received
+        except urllib.error.HTTPError as exc:
+            failures.append("%s → HTTP %d %s" % (url, exc.code, exc.reason))
+        except Exception as exc:  # 超时、DNS、TLS、磁盘都记下来继续试下一个地址
+            failures.append("%s → %s" % (url, exc))
+        try:
+            os.remove(part)
+        except OSError:
+            pass
+    raise RuntimeError("；".join(failures))
+
+
+def _extras_worker(root, entry):
+    key = entry["key"]
+    cache = _extras_cache_dir(root)
+    work = os.path.join(cache, key)
+    part = os.path.join(cache, key + ".zip.part")
+    zip_path = os.path.join(cache, key + ".zip")
+    extract_dir = os.path.join(work, "unpacked")
+    target_abs = os.path.join(root, entry["target"])
+
+    try:
+        shutil.rmtree(work, ignore_errors=True)
+        os.makedirs(work, exist_ok=True)
+        _extras_patch(key, downloading=True, received=0, total=entry["bytes"], error="",
+                      phase="download")
+
+        received = _extras_download(key, entry, part)
+
+        os.replace(part, zip_path)
+        _extras_patch(key, phase="extract")
+        source = _safe_extract(zip_path, extract_dir)
+
+        if os.path.isdir(target_abs):
+            shutil.rmtree(target_abs)
+        os.makedirs(os.path.dirname(target_abs), exist_ok=True)
+        shutil.move(source, target_abs)
+
+        with open(os.path.join(target_abs, ".installed.json"), "w", encoding="utf-8") as fh:
+            json.dump({"url": entry["url"], "rev": entry["rev"], "bytes": received,
+                       "sha256": entry["sha256"], "installedAt": int(time.time())}, fh)
+
+        shutil.rmtree(work, ignore_errors=True)
+        try:
+            os.remove(zip_path)
+        except OSError:
+            pass
+        _extras_patch(key, downloading=False, received=received, total=received,
+                      phase="done", error="")
+        sys.stdout.write("%s - extras %s installed (%d bytes)\n"
+                         % (time.strftime("%Y-%m-%d %H:%M:%S"), key, received))
+        sys.stdout.flush()
+    except PermissionError as exc:
+        _extras_patch(key, downloading=False, phase="error",
+                      error="无法写入 %s（%s）：请确认应用目录对运行账号可写"
+                            % (entry["target"], exc.strerror or "permission denied"))
+        sys.stdout.write("%s - extras %s permission denied\n"
+                         % (time.strftime("%Y-%m-%d %H:%M:%S"), key))
+        sys.stdout.flush()
+        try:
+            os.remove(part)
+        except OSError:
+            pass
+    except Exception as exc:  # 网络/磁盘/校验失败都记在状态里，由前端展示
+        _extras_patch(key, downloading=False, phase="error", error=str(exc)[:300])
+        sys.stdout.write("%s - extras %s failed: %s\n"
+                         % (time.strftime("%Y-%m-%d %H:%M:%S"), key, exc))
+        sys.stdout.flush()
+        try:
+            os.remove(part)
+        except OSError:
+            pass
+
+
+def _extras_start(root, entry):
+    with EXTRAS_LOCK:
+        state = EXTRAS_STATE.setdefault(entry["key"], {})
+        if state.get("downloading"):
+            return False
+        state.update({"downloading": True, "error": "", "received": 0, "phase": "start"})
+        state["updatedAt"] = int(time.time())
+    thread = threading.Thread(target=_extras_worker, args=(root, entry), daemon=True)
+    thread.start()
+    return True
+
 
 class Handler(BaseHTTPRequestHandler):
     server_version = "OpenGames/" + VERSION
@@ -65,6 +331,62 @@ class Handler(BaseHTTPRequestHandler):
     def do_HEAD(self):
         self._handle(head=True)
 
+    def do_POST(self):
+        self._drain_body()
+        raw_path = urllib.parse.urlsplit(self.path).path or "/"
+        path = self._strip_prefix(posixpath.normpath(urllib.parse.unquote(raw_path)))
+        parts = [p for p in path.split("/") if p]
+        # POST /api/extras/<key>/install —— 触发一次后台下载 + 解压
+        if len(parts) == 4 and parts[0] == "api" and parts[1] == "extras" and parts[3] == "install":
+            entry = _extras_entry(self.root, parts[2])
+            if entry is None:
+                return self._json(HTTPStatus.NOT_FOUND, {"error": "unknown extra"})
+            if _extras_installed(self.root, entry):
+                return self._json(HTTPStatus.OK, dict(_extras_status(self.root, entry), started=False))
+            started = _extras_start(self.root, entry)
+            return self._json(HTTPStatus.ACCEPTED,
+                              dict(_extras_status(self.root, entry), started=started))
+        self._json(HTTPStatus.NOT_FOUND, {"error": "no such endpoint"})
+
+    def _drain_body(self):
+        """POST 的请求体必须读完，否则 keep-alive 连接上残留的字节
+        会被当成下一个请求行（游戏用 sendBeacon 打点就会触发）。"""
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+        except (TypeError, ValueError):
+            length = 0
+        if (self.headers.get("Transfer-Encoding") or "").lower() == "chunked":
+            # 不解析 chunked：直接断开，交给浏览器重连
+            self.close_connection = True
+            return
+        remaining = max(0, length)
+        while remaining > 0:
+            chunk = self.rfile.read(min(remaining, 65536))
+            if not chunk:
+                break
+            remaining -= len(chunk)
+
+    def _strip_prefix(self, path):
+        for prefix in self.path_prefixes:
+            if path == prefix:
+                return "/"
+            if path.startswith(prefix + "/"):
+                return path[len(prefix):]
+        return path
+
+    def _json(self, status, payload):
+        body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.end_headers()
+        try:
+            self.wfile.write(body)
+        except (BrokenPipeError, ConnectionResetError):
+            pass
+
     def _handle(self, head):
         raw_path = urllib.parse.urlsplit(self.path).path or "/"
         path = urllib.parse.unquote(raw_path)
@@ -74,13 +396,29 @@ class Handler(BaseHTTPRequestHandler):
             body = json.dumps({"status": "ok", "app": "Open-Games", "version": VERSION}).encode()
             return self._send(head, HTTPStatus.OK, body, "application/json; charset=utf-8")
 
-        for prefix in self.path_prefixes:
-            if path == prefix:
-                path = "/"
-                break
-            if path.startswith(prefix + "/"):
-                path = path[len(prefix):]
-                break
+        path = self._strip_prefix(path)
+
+        parts = [p for p in path.split("/") if p]
+        # GET /api/extras —— 清单 + 每个资源包当前状态
+        if parts and parts[0] == "api" and len(parts) >= 2 and parts[1] == "extras":
+            if len(parts) == 2:
+                payload = []
+                for key in _extras_manifest(self.root):
+                    entry = _extras_entry(self.root, key)
+                    if entry:
+                        payload.append(_extras_status(self.root, entry))
+                return self._json(HTTPStatus.OK, {"items": payload})
+            if len(parts) == 3:
+                entry = _extras_entry(self.root, parts[2])
+                if entry is None:
+                    return self._json(HTTPStatus.NOT_FOUND, {"error": "unknown extra"})
+                return self._json(HTTPStatus.OK, _extras_status(self.root, entry))
+            if len(parts) == 4 and parts[3] == "status":
+                entry = _extras_entry(self.root, parts[2])
+                if entry is None:
+                    return self._json(HTTPStatus.NOT_FOUND, {"error": "unknown extra"})
+                return self._json(HTTPStatus.OK, _extras_status(self.root, entry))
+            return self._json(HTTPStatus.NOT_FOUND, {"error": "no such endpoint"})
 
         target = self._resolve(path)
         if target is None:

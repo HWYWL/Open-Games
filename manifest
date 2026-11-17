@@ -1,7 +1,7 @@
 appname               = Open-Games
-version               = 1.1.0
+version               = 1.3.0
 display_name          = 游戏合集
-desc                  = <p>6 款开源 3D 网页游戏装进飞牛 NAS：鹈鹕骑自行车、穿越火线·运输船、QQ 飞车、几猫 3A 大作、铁幕行动、以撒的结合。</p><p>点封面看详情，点播放键在新标签页开玩；资源随包内置，断网也能玩，手机浏览器同样可用。默认端口 8468。</p><p><img src='https://raw.githubusercontent.com/HWYWL/Open-Games/main/docs/screenshots/intro-strip.jpg' width='300' /></p>
+desc                  = <p>11 款开源网页游戏装进飞牛 NAS：鹈鹕骑自行车、穿越火线·运输船、QQ 飞车、几猫 3A 大作、铁幕行动、以撒的结合、雾港·断电行动、大国崛起 RTS、粉彩核弹小镇、地牢探险、俄罗斯方块。</p><p>点封面看详情，点播放键在新标签页开玩；资源随包内置，断网也能玩，手机浏览器同样可用。默认端口 8468。</p><p><img src='https://raw.githubusercontent.com/HWYWL/Open-Games/main/docs/screenshots/intro-strip.jpg' width='300' /></p>
 platform              = all
 source                = thirdparty
 maintainer            = HWYWL
