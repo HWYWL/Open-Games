@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+<title>吃豆人 · Pac-Man</title>
+<meta name="description" content="经典街机《吃豆人》的 HTML5 移植：多个关卡、改良的幽灵寻路算法，方向键操作。">
+<link rel="shortcut icon" href="favicon.png">
+<style>
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: #0b0d10; color: #e8eef2;
+    font: 16px/1.6 -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+  }
+  .stage { width: min(960px, 100%); }
+  .stage canvas {
+    display: block; width: 100%; height: auto;
+    background: #000; border-radius: 12px; box-shadow: 0 8px 40px rgba(0, 0, 0, .6);
+  }
+  .info { margin-top: 14px; text-align: center; color: #93a0ac; font-size: 15px; line-height: 1.9; }
+  .info b { color: #ffd166; font-weight: 600; }
+  @media (max-width: 520px) { .info { font-size: 13px; } }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <canvas id="canvas" width="960" height="640">你的浏览器不支持画布</canvas>
+    <div class="info"><b>方向键</b> 移动 · <b>回车</b> 开始 · <b>空格</b> 暂停或继续</div>
+  </div>
+  <script src="./static/script/game.js"></script>
+  <script src="./static/script/index.js"></script>
+</body>
+</html>

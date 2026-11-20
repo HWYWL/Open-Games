@@ -1,7 +1,7 @@
 appname               = Open-Games
-version               = 1.4.3
+version               = 1.4.4
 display_name          = 游戏合集
-desc                  = <p>14 款开源网页游戏装进飞牛 NAS：鹈鹕骑自行车、穿越火线·运输船、QQ 飞车、几猫 3A 大作、铁幕行动、以撒的结合、雾港·断电行动、07 号地下层、无声山谷、大国崛起 RTS、带梯子的 Uno、粉彩核弹小镇、地牢探险、俄罗斯方块。</p><p>点封面看详情，点播放键在新标签页开玩；绝大部分资源随包内置，两款大游戏（无声山谷、大国崛起 RTS）首次运行按需下载，之后断网也能玩，手机浏览器同样可用。默认端口 8468。</p><p><img src='https://raw.githubusercontent.com/HWYWL/Open-Games/main/docs/screenshots/intro-strip.jpg' width='300' /></p>
+desc                  = <p>15 款开源网页游戏装进飞牛 NAS：鹈鹕骑自行车、穿越火线·运输船、QQ 飞车、几猫 3A 大作、铁幕行动、以撒的结合、雾港·断电行动、07 号地下层、无声山谷、大国崛起 RTS、带梯子的 Uno、粉彩核弹小镇、地牢探险、俄罗斯方块、吃豆人。</p><p>点封面看详情，点播放键在新标签页开玩；绝大部分资源随包内置，两款大游戏（无声山谷、大国崛起 RTS）首次运行按需下载，之后断网也能玩，手机浏览器同样可用。默认端口 8468。</p><p><img src='https://raw.githubusercontent.com/HWYWL/Open-Games/main/docs/screenshots/intro-strip.jpg' width='300' /></p>
 platform              = all
 source                = thirdparty
 maintainer            = 一叶秋枫

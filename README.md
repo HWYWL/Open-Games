@@ -2,7 +2,7 @@
 
 把开源网页游戏整理成飞牛 NAS 应用：应用中心装好后，桌面出现一个图标，点开是类 Steam 的游戏库面板，点任意游戏封面即在新标签页直接开玩。
 
-当前内置十四款游戏（模型 / 纹理 / 音效均由代码程序化生成或随包内置；两款体积较大的游戏在首次运行时按需下载，之后离线可玩）：
+当前内置十五款游戏（模型 / 纹理 / 音效均由代码程序化生成或随包内置；两款体积较大的游戏在首次运行时按需下载，之后离线可玩）：
 
 | 游戏 | 类型 | 说明 | 开源地址 |
 | --- | --- | --- | --- |
@@ -16,6 +16,7 @@
 | 🌸 粉彩核弹小镇 | 3D 死斗 FPS | 马卡龙色的 Nuketown 街区，25 击杀死斗、8 个机器人、25 级赛季通行证、皮肤商店，界面已中文化 | —（由 `app/nuketown/` 源码构建） |
 | 🗡️ 地牢探险 | 地牢冒险 | 随机房间逐层下潜，哥布林 / 骷髅兵 / 暗影 / 恶魔，捡装备攒金币找神器，界面已中文化 | it-stud.io 单文件页（已汉化） |
 | 🧱 俄罗斯方块 | 益智休闲 | 七种方块、消行升级加速，下一个方块预览与得分统计，界面已中文化 | it-stud.io 单文件页（已汉化） |
+| 🟡 吃豆人 · Pac-Man | 街机益智 | 80 年代街机经典，多关卡，幽灵按玩家坐标实时包抄，能量豆可反追，界面已中文化 | [mumuy/pacman](https://github.com/mumuy/pacman) |
 | 🌫️ 雾港 · 断电行动 | 单关 FPS | 雨雾港区关三座信标再撤离，无人机与四足守卫、三档画质、触屏操作，0.82 MB 断网可玩 | [chencheng666/mist-harbor](https://github.com/chencheng666/mist-harbor) |
 | 🎻 无声山谷 | 第三人称动作 RPG | 唤醒八座沉默尖塔：清庭院、敲钟、调音，拾音符开圣匣、戴护符闯试炼，乘光弦在庭院间传送；峡谷与城邦全程序化生成，已汉化 | [Leonxlnx/unsung-vale](https://github.com/Leonxlnx/unsung-vale) |
 | 🗺️ 大国崛起 · 雪岭入海 | 即时战略 RTS | 九大战区 + 遭遇战，五阵营海陆空三军，程序生成地形与补给经济 | [chencheng666/great-powers-rts](https://github.com/chencheng666/great-powers-rts) |
@@ -163,6 +164,7 @@ python3 scripts/pack-asset.py \
 | 以撒的结合 · 地下室的束缚 | [liyupi/binding-of-isaac-webgame](https://github.com/liyupi/binding-of-isaac-webgame) | 零依赖零构建，原样拷贝 `index.html` + `css/` + `js/` |
 | 粉彩核弹小镇 | 本仓库 `app/nuketown/`（源码 + 联机中继） | 源码打包成 `games/nuketown/index.html`，three.js 改走本地 `www/vendor/`，界面文案已中文化 |
 | 地牢探险 / 俄罗斯方块 | it-stud.io 的两个单文件页 | 单文件直接放入 `games/`，界面文案（原为德文）已中文化 |
+| 吃豆人 · Pac-Man | [mumuy/pacman](https://github.com/mumuy/pacman) | 剥掉路人甲站点的页头页脚、统计脚本与「非本站就跳转」的反盗链代码，只留 canvas + 游戏脚本；canvas 文案改中文并加系统中文字体回退 |
 | 雾港 · 断电行动 | [chencheng666/mist-harbor](https://github.com/chencheng666/mist-harbor) | 直接拷贝上游 `dist/`（内含自带 three.js 0.160.1），页面全用相对路径，不依赖 CDN |
 | 大国崛起 · 雪岭入海 | [chencheng666/great-powers-rts](https://github.com/chencheng666/great-powers-rts) | `npm install` 后用 `--base=./` 构建，再打成 Release 资源包由服务端按需下载（见上一节）；联机服务端未接入，只提供单机 AI 对战 |
 | 无声山谷 | [Leonxlnx/unsung-vale](https://github.com/Leonxlnx/unsung-vale) | `npm run build` 后把 `dist/` 拷成 `app/www/games/unsung-vale/`，再打成 Release 资源包按需下载；体积 36 MB，界面与对白已汉化 |
