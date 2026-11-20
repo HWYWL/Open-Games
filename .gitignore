@@ -1,5 +1,6 @@
 # 运行时下载的大游戏资源（由 play.html + 服务端解压出来，别提交）
 app/www/games/great-powers-rts/
+app/www/games/unsung-vale/
 app/www/games/*/.installed.json
 
 # 下载/解压中间文件

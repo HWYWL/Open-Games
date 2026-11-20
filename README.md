@@ -2,7 +2,7 @@
 
 把开源网页游戏整理成飞牛 NAS 应用：应用中心装好后，桌面出现一个图标，点开是类 Steam 的游戏库面板，点任意游戏封面即在新标签页直接开玩。
 
-当前内置十一款游戏（模型 / 纹理 / 音效均由代码程序化生成或随包内置，无外部资源依赖）：
+当前内置十三款游戏（模型 / 纹理 / 音效均由代码程序化生成或随包内置；两款体积较大的游戏在首次运行时按需下载，之后离线可玩）：
 
 | 游戏 | 类型 | 说明 | 开源地址 |
 | --- | --- | --- | --- |
@@ -16,7 +16,9 @@
 | 🗡️ 地牢探险 | 地牢冒险 | 随机房间逐层下潜，哥布林 / 骷髅兵 / 暗影 / 恶魔，捡装备攒金币找神器，界面已中文化 | it-stud.io 单文件页（已汉化） |
 | 🧱 俄罗斯方块 | 益智休闲 | 七种方块、消行升级加速，下一个方块预览与得分统计，界面已中文化 | it-stud.io 单文件页（已汉化） |
 | 🌫️ 雾港 · 断电行动 | 单关 FPS | 雨雾港区关三座信标再撤离，无人机与四足守卫、三档画质、触屏操作，0.82 MB 断网可玩 | [chencheng666/mist-harbor](https://github.com/chencheng666/mist-harbor) |
+| 🎻 无声山谷 | 第三人称动作 RPG | 唤醒八座沉默尖塔：清庭院、敲钟、调音，拾音符开圣匣、戴护符闯试炼，乘光弦在庭院间传送；峡谷与城邦全程序化生成，已汉化 | [Leonxlnx/unsung-vale](https://github.com/Leonxlnx/unsung-vale) |
 | 🗺️ 大国崛起 · 雪岭入海 | 即时战略 RTS | 九大战区 + 遭遇战，五阵营海陆空三军，程序生成地形与补给经济 | [chencheng666/great-powers-rts](https://github.com/chencheng666/great-powers-rts) |
+| 🪜 带梯子的 Uno | 竞速 · WebGPU | 屋顶绑铝梯的菲亚特 Uno 跑卢梅山道，车 / 赛道 / 植被全程序化，475 KB 单文件，界面已中文化 | [viktorkav/uno-com-escada](https://github.com/viktorkav/uno-com-escada)（PolyForm 非商业授权） |
 
 > 面板里每款游戏的详情弹窗右下角也有「开源项目」按钮，可直接跳到上面的原始仓库。
 
@@ -69,6 +71,7 @@ Open-Games/
             ├── ironhold/                # 单文件游戏 + 本地 three.js（界面已中文化）
             ├── nuketown/                # 单文件游戏 + 本地 three.js（界面已中文化）
             ├── mist-harbor/             # 多文件静态站（三个 vendor + 8 个 js + css）
+            ├── uno-com-escada/          # 单文件游戏（WebGPU，界面已中文化）
             └── great-powers-rts/        # 不进包：首次运行时下载解压（见「放不进安装包的大游戏」）
 ```
 
@@ -96,6 +99,7 @@ python app/server/server.py --host 127.0.0.1 --port 8468 --root app/www
 - 健康检查接口：`GET /healthz` → `{"status":"ok"}`
 - 全部游戏离线可玩，除首屏外不请求任何外网资源
 - 《粉彩核弹小镇》的「单人」模式（对 8 个机器人）离线可玩；「开始游戏」的房间联机需要 WebSocket 中继（`app/nuketown/server.mjs`），静态服务默认不启动它，未启动时联机入口会连不上、停在离线状态
+- 《带梯子的 Uno》依赖 **WebGPU**：需要桌面版 Chrome / Edge（111+）并开启硬件加速；Safari 17.4+ 与部分手机浏览器可用，Firefox 与旧版浏览器会直接显示「这个赛道需要 WebGPU 支持」的提示。它也不支持触屏，建议在电脑上玩
 
 排查启动问题：
 
@@ -159,6 +163,8 @@ python3 scripts/pack-asset.py \
 | 地牢探险 / 俄罗斯方块 | it-stud.io 的两个单文件页 | 单文件直接放入 `games/`，界面文案（原为德文）已中文化 |
 | 雾港 · 断电行动 | [chencheng666/mist-harbor](https://github.com/chencheng666/mist-harbor) | 直接拷贝上游 `dist/`（内含自带 three.js 0.160.1），页面全用相对路径，不依赖 CDN |
 | 大国崛起 · 雪岭入海 | [chencheng666/great-powers-rts](https://github.com/chencheng666/great-powers-rts) | `npm install` 后用 `--base=./` 构建，再打成 Release 资源包由服务端按需下载（见上一节）；联机服务端未接入，只提供单机 AI 对战 |
+| 无声山谷 | [Leonxlnx/unsung-vale](https://github.com/Leonxlnx/unsung-vale) | `npm run build` 后把 `dist/` 拷成 `app/www/games/unsung-vale/`，再打成 Release 资源包按需下载；体积 36 MB，界面与对白已汉化 |
+| 带梯子的 Uno | [viktorkav/uno-com-escada](https://github.com/viktorkav/uno-com-escada)（`astra/`） | 上游给了三个版本，取 Astra；翻译 `astra/source/page.html` 与 `render.js` / `main.js` 里的报错文案后 `python3 source/build.py` 重新打包。**授权为 PolyForm Noncommercial 1.0.0，仅限非商业使用** |
 
 三款 Three.js 游戏（鹈鹕 / 运输船 / QQ 飞车）重新构建：
 
@@ -211,10 +217,25 @@ python3 scripts/pack-asset.py --src app/www/games/great-powers-rts \
     --out dist-assets/great-powers-rts.zip
 ```
 
-面板里的游戏清单、简介、键位表、开源地址都在 `app/www/index.html` 顶部的 `GAMES` 数组里，新增游戏只要把文件放进 `app/www/games/`，再补一条带 `href` 与 `repo` 的记录即可。
+带梯子的 Uno 更新：
+
+```bash
+git clone https://github.com/viktorkav/uno-com-escada
+cp -r uno-com-escada/astra/source /tmp/uno-src     # 在副本里改，别动上游
+# 需要重做的中文改动：source/page.html（全部 UI 文案）、
+# source/main.js 与 source/render.js 里的 throw Error(...) 提示
+PYTHONUTF8=1 python3 /tmp/uno-src/build.py /tmp/uno-src/out.html
+cp /tmp/uno-src/out.html <本仓库>/app/www/games/uno-com-escada/index.html
+# 注意：起跑门架上的 3D 字仍为 "SERRA DO LUME" —— 它用的是内置 5×7 点阵字体，
+# 只认拉丁大写字母，中文字模没有对应字形，改了会直接不显示。
+# Windows 下必须带 PYTHONUTF8=1，否则 build.py 会按 GBK 读源码报 UnicodeDecodeError。
+```
+
+面板里的游戏清单、简介、键位表、开源地址都在 `app/www/index.html` 顶部的 `GAMES` 数组里，新增游戏只要把文件放进 `app/www/games/`，再补一条带 `href` 与 `repo` 的记录即可。体积大的游戏别放进 `app/www/games/`（会把安装包撑大）：照上一节打成 Release 资源包，`extras.json` 加一条记录，卡片 `href` 写成 `play.html?g=<key>`。
 
 ## 致谢与声明
 
 - 游戏源代码与美术分别来自 [claude-opus-5-5-demo](https://github.com/riba2534/claude-opus-5-5-demo)、[binding-of-isaac-webgame](https://github.com/liyupi/binding-of-isaac-webgame)、[saltline-fable-5.2](https://github.com/realcodebear/saltline-fable-5.2)、[operation-ironhold](https://github.com/StarKnightt/operation-ironhold)、[mist-harbor](https://github.com/chencheng666/mist-harbor)、[great-powers-rts](https://github.com/chencheng666/great-powers-rts)，均为 MIT 许可；本仓库只做移植、封装、中文化与面板，封面横幅为展示用途的 AI 生成插图
+- **[viktorkav/uno-com-escada](https://github.com/viktorkav/uno-com-escada) 例外**：它使用 [PolyForm Noncommercial 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0)，允许自由使用、修改与分享，但**禁止商业用途**。因此《带梯子的 Uno》所在文件头部保留了原作署名与许可证注释；如果你的使用场景涉及商业分发，请单独取得原作者授权，或者删掉 `app/www/games/uno-com-escada/` 后重新打包。
 - 《穿越火线》《QQ 飞车》《以撒的结合》相关作品均为致敬性质的演示作品，与原厂 / 原作者无关；Saltline 与 Operation Ironhold 为原作者的独立作品，此处仅作本地托管
 - 本仓库代码以 MIT 许可证发布，见 [LICENSE](LICENSE)
