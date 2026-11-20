@@ -12,11 +12,11 @@
   "unsung-vale": {
     "title": "无声山谷",
     "target": "games/unsung-vale",
-    "rev": "2026-11-20.1",
+    "rev": "2026-11-20.2",
     "url": "https://github.com/HWYWL/Open-Games/releases/download/game-assets-v1/unsung-vale.zip",
     "mirrors": [],
-    "bytes": 37767934,
-    "sha256": "a8e610a511030e5136f0c306b9386c69d0981d196dd3ced773740ddeac4e1db3",
+    "bytes": 37795419,
+    "sha256": "f10c2554867dfe7ab460a3808c763b4c7d794f8f1ba485c66d65321b2990242f",
     "note": "首次运行下载约 36 MB，之后本地离线可玩；资源包更新时改 rev 即可让已安装的机器重新下载"
   }
 }
