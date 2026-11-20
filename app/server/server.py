@@ -452,9 +452,16 @@ class Handler(BaseHTTPRequestHandler):
 
         accepts_gzip = "gzip" in (self.headers.get("Accept-Encoding") or "")
         if accepts_gzip and ext in COMPRESSIBLE and len(data) >= GZIP_MIN_SIZE:
+            # 缓存键带上 mtime 与大小：文件被覆盖但大小没变时（改版 index.html 很常见）
+            # 只比大小会把旧内容发给浏览器。
+            try:
+                st = os.stat(target)
+                stamp = (st.st_mtime_ns, st.st_size)
+            except OSError:
+                stamp = (0, len(data))
             cached = GZIP_CACHE.get(target)
-            if cached is None or cached[0] != len(data):
-                cached = (len(data), gzip.compress(data, 5))
+            if cached is None or cached[0] != stamp:
+                cached = (stamp, gzip.compress(data, 5))
                 GZIP_CACHE[target] = cached
             data = cached[1]
             self._send(head, HTTPStatus.OK, data, ctype, encoding="gzip")
