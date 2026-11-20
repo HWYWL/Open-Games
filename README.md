@@ -2,7 +2,7 @@
 
 把开源网页游戏整理成飞牛 NAS 应用：应用中心装好后，桌面出现一个图标，点开是类 Steam 的游戏库面板，点任意游戏封面即在新标签页直接开玩。
 
-当前内置十三款游戏（模型 / 纹理 / 音效均由代码程序化生成或随包内置；两款体积较大的游戏在首次运行时按需下载，之后离线可玩）：
+当前内置十四款游戏（模型 / 纹理 / 音效均由代码程序化生成或随包内置；两款体积较大的游戏在首次运行时按需下载，之后离线可玩）：
 
 | 游戏 | 类型 | 说明 | 开源地址 |
 | --- | --- | --- | --- |
@@ -10,6 +10,7 @@
 | 🔫 穿越火线 · 运输船 | FPS 团队枪战 | 考据还原「运输船」地图，枪械弹道与后坐力、bots 对战、击杀播报 | [riba2534/claude-opus-5-5-demo · cf-transport-ship](https://github.com/riba2534/claude-opus-5-5-demo/tree/main/cf-transport-ship) |
 | 🎯 几猫 · 国产 3A 大作 | 单关 FPS | 雨夜集装箱港口，切断三个上行链路中继器，躲开无人机与机器狗，1.4 MB 单文件 | [realcodebear/saltline-fable-5.2](https://github.com/realcodebear/saltline-fable-5.2) |
 | 🪖 铁幕行动 · 仓库区 | 单关 FPS | 3 分钟清空仓库区 10 名敌人，四把枪各自机瞄倍率，二段跳 / 攀越，界面已中文化 | [StarKnightt/operation-ironhold](https://github.com/StarKnightt/operation-ironhold) |
+| 🎬 07 号地下层 · 一句话 FPS 复现 | 三波防守 FPS | 潮湿地下降温站，红点卡宾枪打三波哨戒无人机；同目录还有 WebAudio 音效台、雨夜码头材质、岸基建模三个实验，界面已中文化 | [wquguru/fable52-fps-repro](https://github.com/wquguru/fable52-fps-repro) |
 | 🏎️ QQ 飞车 | 竞速漂移 | 漂移集气、小喷 / 双喷 / 氮气、四张原创赛道、道具赛 | [riba2534/claude-opus-5-5-demo · qq-speed](https://github.com/riba2534/claude-opus-5-5-demo/tree/main/qq-speed) |
 | 👶 以撒的结合 · 地下室的束缚 | 肉鸽弹幕地牢 | 12 层随机地牢、13 个 Boss、11 种敌人、55 件可叠加道具，Canvas 全程序化绘图 | [liyupi/binding-of-isaac-webgame](https://github.com/liyupi/binding-of-isaac-webgame) |
 | 🌸 粉彩核弹小镇 | 3D 死斗 FPS | 马卡龙色的 Nuketown 街区，25 击杀死斗、8 个机器人、25 级赛季通行证、皮肤商店，界面已中文化 | —（由 `app/nuketown/` 源码构建） |
@@ -158,6 +159,7 @@ python3 scripts/pack-asset.py \
 | QQ 飞车 | [claude-opus-5-5-demo/qq-speed](https://github.com/riba2534/claude-opus-5-5-demo/tree/main/qq-speed) | 同上 |
 | 几猫 · 国产 3A 大作 | [realcodebear/saltline-fable-5.2](https://github.com/realcodebear/saltline-fable-5.2) | 上游本身是单个 `index.html`，改名 `saltline.html` 后直接放入 |
 | 铁幕行动 · 仓库区 | [StarKnightt/operation-ironhold](https://github.com/StarKnightt/operation-ironhold) | 单个 `index.html` + 本地 `three.min.js`（替代 CDN），界面文案已翻译为中文 |
+| 07 号地下层 · 一句话 FPS 复现 | [wquguru/fable52-fps-repro](https://github.com/wquguru/fable52-fps-repro) | 静态整包搬运（入口页 + 4 个 demo），three.js 与 addon 由 CDN 改为 `_vendor/` 本地副本，04-fps 界面文案已翻译为中文 |
 | 以撒的结合 · 地下室的束缚 | [liyupi/binding-of-isaac-webgame](https://github.com/liyupi/binding-of-isaac-webgame) | 零依赖零构建，原样拷贝 `index.html` + `css/` + `js/` |
 | 粉彩核弹小镇 | 本仓库 `app/nuketown/`（源码 + 联机中继） | 源码打包成 `games/nuketown/index.html`，three.js 改走本地 `www/vendor/`，界面文案已中文化 |
 | 地牢探险 / 俄罗斯方块 | it-stud.io 的两个单文件页 | 单文件直接放入 `games/`，界面文案（原为德文）已中文化 |
