@@ -122,9 +122,10 @@
   /* 把服务端抛回来的英文异常翻成能照着做的中文 */
   function humanError(text) {
     var t = String(text || "");
+    var zip = (entry && entry.url ? entry.url.split("/").pop() : "") || (key + ".zip");
     if (/HTTP 404/.test(t))
       return "资源包还没发布：下载地址返回 404（Release 里没有这个文件，或 tag / 文件名对不上）。" +
-        "把 <code>great-powers-rts.zip</code> 传到 GitHub Release，或者改 <code>app/www/extras.json</code> 里的 <code>url</code>。";
+        "把 <code>" + zip + "</code> 传到 GitHub Release，或者改 <code>app/www/extras.json</code> 里的 <code>url</code>。";
     if (/HTTP 403|HTTP 429/.test(t))
       return "下载源拒绝了请求（403 / 429，可能是频率限制或需要登录），过一会儿再试，或换镜像地址。";
     if (/timed out|timeout|getaddrinfo|Name or service|SSL|Connection|reset/i.test(t))
@@ -214,7 +215,7 @@
         $("go").disabled = true;
         $("go").classList.add("hidden");
         showError("自动下载需要 Open-Games 自带的 Python 服务端（默认端口 8468，接口 <code>/api/extras</code>）。",
-          "静态托管时请手动下载并解压到 app/www/games/great-powers-rts/");
+          "静态托管时请手动下载并解压到 app/www/" + ((entry && entry.target) || ("games/" + key)) + "/");
       });
   }
 
@@ -257,7 +258,7 @@
         (entry.bytes ? mb(entry.bytes) : "约 110 MB") +
         "），没有放进安装包，第一次打开时下载一次。下载完成后自动解压，之后完全离线运行。";
       $("hint").innerHTML = "下载由本机服务端完成，关掉这个页面不会中断；失败可以点按钮重试。" +
-        '手动安装：把 zip 解压到 <code>app/www/games/great-powers-rts/</code>，' +
+        '手动安装：把 zip 解压到 <code>app/www/' + ((entry && entry.target) || ("games/" + key)) + '/</code>，' +
         '<a id="srcLink" href="' + entry.url + '" target="_blank" rel="noopener noreferrer">下载地址</a>。';
       $("go").addEventListener("click", begin);
       poll();
